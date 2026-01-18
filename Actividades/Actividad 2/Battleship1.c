@@ -1,12 +1,11 @@
-#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 
 #define N 12
 
 int main(void) {
-    srand(timne(NULL));
+    srand(time(NULL));
     
     char disparos[N][N];
     char tablero[N][N];
@@ -14,6 +13,7 @@ int main(void) {
     char tableroJugador[N][N];
     char tableroMaquina[N][N];
     char disparosJugador[N][N];
+    char disparosMaquina[N][N];
     int i, j;
     int num = 1;
     int opcion;
@@ -26,12 +26,37 @@ int main(void) {
         switch (opcion) {
             case 1:
                 printf("\nComenzando el juego...\n");
+
+                for (i = 0; i < N; i++) {
+                    for (j = 0; j < N; j++) {
+                        tableroJugador[i][j] = 'A';
+                        tableroMaquina[i][j] = 'A';
+                        disparosJugador[i][j] = '*';
+                        disparosMaquina[i][j] = '*';
+
+                    }
+                }
+
+                num = 1;
+
+                // Colocar varios barcos
+                pedirYColocarBarco(tableroJugador, 4, num++); // barco grande
+                pedirYColocarBarco(tableroJugador, 3, num++); // barcos medianos
+                pedirYColocarBarco(tableroJugador, 3, num++); 
+                pedirYColocarBarco(tableroJugador, 2, num++); // barcos pequeños
+                pedirYColocarBarco(tableroJugador, 2, num++);
+                pedirYColocarBarco(tableroJugador, 2, num++);
+
+                // Cadena de texto para tablero jugador y disparos
+                imprimirTablero(tableroJugador, "Tablero del jugador");
+
                 break;
 
         // Opción mejores puntajes
             case 2:
-                prinft("\nMostrando mejores puntajes...\n");
+                printf("\nMostrando mejores puntajes...\n");
                 break;
+
         // Opción salir del juego
             case 3:
                 printf("\nSaliendo del juego.\n");
@@ -58,23 +83,6 @@ int main(void) {
             tablero[i][j] = 'A';
         }
     }
-
-    // Colocar varios barcos (ejemplo)
-    pedirYColocarBarco(tablero, 4, num++); // barco grande
-    imprimirTablero(tablero, "Tablero del jugador");
-
-    pedirYColocarBarco(tablero, 3, num++); // barco mediano
-    imprimirTablero(tablero, "Tablero del jugador");
-
-    pedirYColocarBarco(tablero, 2, num++); // barco pequeño
-    imprimirTablero(tablero, "Tablero del jugador");
-
-    pedirYColocarBarco(tablero, 2, num++); // otro pequeño
-    imprimirTablero(tablero, "Tablero del jugador");
-    
-    // Cadena de texto para tablero jugador y disparos
-    imprimirTablero(tablero, "Tablero del jugador");
-    imprimirTablero(disparos, "Tablero de disparos");
 
     return 0;
 }
@@ -186,14 +194,14 @@ int disparosJugador(char maquina[N][N], char tableroMaquina[N][N], char tableroD
     scanf("%d", &columna);
 
     // Indicador de disparo fuera
-    if (fila < 0 || columna < 0 || columna >= N) {
+    if (fila < 0 || fila >= N || columna < 0 || columna >= N) {
         printf("Fuera del tablero");
         return 1;
     }
 
     // Indicador de disparo mismo lugar
     if (tableroDisparos[fila][columna] != '*') {
-        print("Ya disparaste ahí. \n");
+        printf("Ya disparaste ahí. \n");
         return 1;
     }
 
@@ -216,7 +224,7 @@ int disparosJugador(char maquina[N][N], char tableroMaquina[N][N], char tableroD
 int disparosMaquina(char tableroJugador[N][N], char disparosMaquina[N][N]) {
     int fila, columna;
 
-    prinf("\n=== TURNO DE LA MAQUINA ===\n");
+    printf("\n=== TURNO DE LA MAQUINA ===\n");
 
     // Disparo aleatorio
     do {
@@ -226,11 +234,11 @@ int disparosMaquina(char tableroJugador[N][N], char disparosMaquina[N][N]) {
     
     while (disparosMaquina[fila][columna] != '*');
 
-    prinf("La maquina dispara a (%d, %d)\n", fila, columna);
+    printf("La maquina dispara a (%d, %d)\n", fila, columna);
 
     // Comprobación del disparo
     if (tableroJugador[fila][columna] == 'B') {
-        pinft("La maquina ¡ACERTÓ!\n");
+        printf("La maquina ¡ACERTÓ!\n");
         tableroJugador[fila][columna] = 'X';
         disparosMaquina[fila][columna] = 'X';
         return 1;
