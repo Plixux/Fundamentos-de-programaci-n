@@ -13,11 +13,11 @@
     void colocarBarcosMaquina(char t[N][N]);
     int disparosJugador(char tableroMaquina[N][N], char tableroDisparosJugador[N][N], int *puntos, int *racha);
     int disparosMaquina(char tableroJugador[N][N], char tableroDisparosMaquina[N][N], int *puntos, int *racha);
+    int quedanBarcos(char t[N][N]);
     void guardarScore(const char *nombre, int puntos);
     void mostrarScores(void);
-    int quedanBarcos(char t[N][N]);
-
-    // MAIN
+    
+    // MAIN //
     int main(void) {
         srand(time(NULL));
 
@@ -135,7 +135,9 @@
         return 0;
     }
 
-    // FUNCIONES
+    // FUNCIONES //
+
+    // Función para imprir el menú
     int menu(void) {
         char buffer[32];
         int opcion = 0;
@@ -153,6 +155,7 @@
         return opcion;
     }
 
+    // Inicializar tablero N x N relleno
     void inicializarTablero(char t[N][N], char simbolo) {
         int i, j;
         for (i = 0; i < N; i++) {
@@ -162,6 +165,7 @@
         }
     }
 
+    // Imprime el tablero, mostrando filas y columnas
     void imprimirTablero(char t[N][N], const char *titulo) {
         int i, j;
 
@@ -182,6 +186,7 @@
         }
     }
 
+    // Solicitar coordenadas para colocar los barcos
     void pedirYColocarBarco(char t[N][N], int tam, int numeroBarco) {
         int fila, columna, i;
         char orientacion;
@@ -249,6 +254,7 @@
         }
     }
 
+    // Colocación random de los barcos de la maquina
     void colocarBarcosMaquina(char t[N][N]) {
         int fila, columna, i;
         int tam;
@@ -312,6 +318,7 @@
 
     }
 
+    // Disparo del jugador solicitando coordenadas
     int disparosJugador(char tableroMaquina[N][N], char tableroDisparosJugador[N][N], int *puntos, int *racha) {
 
         
@@ -357,6 +364,7 @@
 
         }
 
+    // Disparo de la maquina selección aleatoria
     int disparosMaquina(char tableroJugador[N][N], char tableroDisparosMaquina[N][N], int *puntos, int *racha) {
 
 
@@ -389,6 +397,7 @@
 
         }
 
+    // Verifica si aún quedan barcos sin hundir en el tablero 
     int quedanBarcos(char t[N][N]) {
         int i, j;
         
@@ -403,6 +412,7 @@
         return 0; // No quedan barcos
     }
   
+    // Guarda el nombre del jugador y su puntaje en el archivo "scores.txt"
     void guardarScore(const char *nombre, int puntos) {
         FILE *f = fopen("scores.txt", "a");  // "a" = agrega al final, no borra lo anterior
         if (f == NULL) {
@@ -414,6 +424,7 @@
         fclose(f);
     }
     
+    // Muestra en pantalla los puntos almacenados en "scores.txt"
     void mostrarScores(void) {
         FILE *f = fopen("scores.txt", "r");
         if (f == NULL) {
