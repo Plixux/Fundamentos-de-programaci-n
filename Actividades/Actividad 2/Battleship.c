@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+// Tamaño tablero
 #define N 12
 
 //PROTOTIPOS
@@ -10,6 +11,9 @@ void inicializarTablero(char t[N][N], char simbolo);
 void imprimirTablero(char t[N][N], const char *titulo);
 void pedirYColocarBarco(char t[N][N], int tam, int numeroBarco);
 void colocarBarcosMaquina(char t[N][N]);
+int disparosJugador(char tableroMaquina[N][N], char tableroDisparosJugador[N][N]);
+int disparosMaquina(char tableroJugador[N][N], char tableroDisparosMaquina[N][N]);
+int quedanBarcos(char t[N][N]);
 
 // MAIN
 int main(void) {
@@ -47,36 +51,47 @@ int main(void) {
                 pedirYColocarBarco(tableroJugador, 2, num++);
 
                 // Colocación de barcos de la maquina
-                colocarBarcosMaquina(tableroMaquina, 4, num++);
-                colocarBarcosMaquina(tableroMaquina, 3, num++);
-                colocarBarcosMaquina(tableroMaquina, 3, num++);
-                colocarBarcosMaquina(tableroMaquina, 2, num++);
-                colocarBarcosMaquina(tableroMaquina, 2, num++);
-                colocarBarcosMaquina(tableroMaquina, 2, num++);
+                colocarBarcosMaquina(tableroMaquina);
 
                 imprimirTablero(tableroJugador, "TABLERO DEL JUGADOR");
-                imprimirTablero(tableroMaquina, "TABLERO DEL MAQUINA");
 
                 int sigueJugando = 1;
                 int acierto;
+                int turnoJugador = 1; // 1 = jugador, 0 = máquina
 
                 // Bucle de disparos
                 while (sigueJugando) {
 
-                    // Turno jugador
-                    do {
-                        acierto = disparosJugador(tableroMaquina, tableroMaquina, disparosJugador);
+                    if (turnoJugador) {
+                        acierto = disparosJugador(tableroMaquina, tableroDisparosJugador);
+
+                        if (!quedanBarcos(tableroMaquina)) {
+                            printf("\n¡HAS GANADO! Hundiste todos los barcos enemigos.\n");
+                            break;
+                        }
+
+                        if (!acierto) {
+                            turnoJugador = 0; // cambia turno
+                        }
+
+                    } 
+                    
+                    else {
+
+                        acierto = disparosMaquina(tableroJugador, tableroDisparosMaquina);
+
+                        if (!quedanBarcos(tableroJugador)) {
+                            printf("\nHAS PERDIDO. La máquina hundió todos tus barcos.\n");
+                            break;
+                        }
+
+                        if (!acierto) {
+                            turnoJugador = 1; // cambia turno
+                        }
                     }
-
-                    while (acierto);
-
-                    // Turno Maquina
-                    do {
-                        acierto = disparosMaquina(tableroJugador, disparosMaquina);
-                    }
-
-                    while (acierto);
                 }
+
+
 
                 printf("\nPresiona ENTER para volver al menú...");
                 getchar();
@@ -173,22 +188,22 @@ void pedirYColocarBarco(char t[N][N], int tam, int numeroBarco) {
         }
 
         if (fila < 0 || fila >= N || columna < 0 || columna >= N) {
-            printf("❌ Posición fuera del tablero.\n");
+            printf("Posición fuera del tablero.\n");
             continue;
         }
 
         if (orientacion == 'H' && columna + tam > N) {
-            printf("❌ No cabe horizontalmente.\n");
+            printf("No cabe horizontalmente.\n");
             continue;
         }
 
         if (orientacion == 'V' && fila + tam > N) {
-            printf("❌ No cabe verticalmente.\n");
+            printf("No cabe verticalmente.\n");
             continue;
         }
 
         if (orientacion != 'H' && orientacion != 'V') {
-            printf("❌ Orientación inválida.\n");
+            printf("Orientación inválida.\n");
             continue;
         }
 
@@ -202,7 +217,7 @@ void pedirYColocarBarco(char t[N][N], int tam, int numeroBarco) {
         }
 
         if (!valido) {
-            printf("❌ Hay otro barco en esa posición.\n");
+            printf("Hay otro barco en esa posición.\n");
             continue;
         }
 
@@ -279,4 +294,83 @@ void colocarBarcosMaquina(char t[N][N]) {
         }
     }
 
+}
+
+int disparosJugador(char tableroMaquina[N][N], char tableroDisparosJugador[N][N]) {
+    
+    int fila, columna;
+
+    imprimirTablero(tableroDisparosJugador, "TABLERO DE DISPAROS");
+
+    printf("ingresa fila: ");
+    scanf("%d", &fila);
+    printf("Ingresa columna: ");
+    scanf("%d", &columna);
+    getchar(); // limpiar buffer
+
+    // Validar rango
+    if (fila < 0 || fila >= N || columna < 0 || columna >= N) {
+        printf("Disparo fuera del tablero\n");
+        return 1;
+    }
+
+    // Disparo repetido
+    if (tableroDisparosJugador[fila][columna] != '*') {
+        printf("Ya disparaste ahí\n");
+        return 1;
+    }
+
+    // Impacto
+    if (tableroMaquina[fila][columna] == 'B') {
+        printf("¡IMPACTO!\n");
+        tableroDisparosJugador[fila][columna] = 'X';
+        tableroMaquina[fila][columna] = 'X';
+        return 1; // Volver a disparar
+    }
+
+    //Agua
+    printf("Agua\n");
+    tableroDisparosJugador[fila][columna] = 'A';
+    return 0; // Finalizar el turno
+
+    }
+
+int disparosMaquina(char tableroJugador[N][N], char tableroDisparosMaquina[N][N]) {
+
+    int fila, columna;
+
+    do {
+        fila = rand() % N;
+        columna = rand() % N;
+    }
+
+    while (tableroDisparosMaquina[fila][columna] != '*');
+
+    printf("La máquina dispara a (%d, %d)\n", fila, columna);
+
+    if (tableroJugador[fila][columna] == 'B') {
+        printf("La máquina acertó\n");
+        tableroJugador[fila][columna] = 'X';
+        tableroDisparosMaquina[fila][columna] = 'X';
+        return 1; // Vuelve a disparar
+    }
+
+    printf("La máquina falló\n");
+    tableroDisparosMaquina[fila][columna] = 'A';
+    return 0;
+
+    }
+
+int quedanBarcos(char t[N][N]) {
+    int i, j;
+    
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (t[i][j] == 'B') {
+                return 1; // Aún quedan barcos
+            }
+        }
+    }
+
+    return 0; // No quedan barcos
 }
